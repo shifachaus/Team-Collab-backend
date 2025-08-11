@@ -16,6 +16,7 @@ export const errorHandler: ErrorRequestHandler = (
     });
   }
 
+  // Handles custom AppError and sends back its status, message, and error code
   if (error instanceof AppError) {
     return res.status(error.statusCode).json({
       message: error.message,

@@ -6,6 +6,7 @@ type AyncControllerType = (
   next: NextFunction
 ) => Promise<any>;
 
+//  handle async route errors
 export const asyncHandler = (
   controller: AyncControllerType
 ): AyncControllerType => {
