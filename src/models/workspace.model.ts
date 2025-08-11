@@ -10,7 +10,7 @@ export interface workspaceDocument extends Document {
   updatedAt: string;
 }
 
-const workspaceSchema = new Schema(
+const workspaceSchema = new Schema<workspaceDocument>(
   {
     name: {
       type: String,

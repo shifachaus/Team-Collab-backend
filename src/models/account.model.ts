@@ -12,7 +12,7 @@ export interface AccountDocument extends Document {
   createdAt: Date;
 }
 
-const accountSchema = new Schema(
+const accountSchema = new Schema<AccountDocument>(
   {
     userId: {
       type: Schema.Types.ObjectId,

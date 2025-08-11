@@ -15,7 +15,7 @@ export interface UserDocument extends Document {
   omitPassword(): Omit<UserDocument, "password">;
 }
 
-const userSchema = new Schema(
+const userSchema = new Schema<UserDocument>(
   {
     name: {
       type: String,
