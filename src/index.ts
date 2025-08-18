@@ -13,6 +13,8 @@ import { ErrorCodeEnum } from "./enums/error-code.enum";
 import "./config/passport.config";
 import passport from "passport";
 import authRoutes from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
+import isAuthenticated from "./middlewares/isAuthenticated.middleware";
 
 //App Initialization
 const app = express();
@@ -32,7 +34,6 @@ app.use(
     secure: config.NODE_ENV == "production",
     httpOnly: true,
     sameSite: "lax",
-    
   })
 );
 
@@ -62,6 +63,7 @@ app.get(
 
 // mount 
 app.use(`${BASE_PATH}/auth`, authRoutes);
+app.use(`${BASE_PATH}/user`,isAuthenticated, userRoutes);
 
 // error handler
 app.use(errorHandler);
