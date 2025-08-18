@@ -10,8 +10,13 @@ import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import { BadRequestException } from "./utils/app-error";
 import { ErrorCodeEnum } from "./enums/error-code.enum";
 
+import "./config/passport.config";
+import passport from "passport";
+import authRoutes from "./routes/auth.routes";
+
 //App Initialization
 const app = express();
+
 const BASE_PATH = config.BASE_PATH;
 
 //Middleware Setup
@@ -29,6 +34,10 @@ app.use(
     sameSite: "lax",
   })
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(
   cors({
     origin: config.FRONTEND_ORIGIN,
@@ -44,10 +53,13 @@ app.get(
       ErrorCodeEnum.AUTH_INVALID_TOKEN
     );
     return res.status(HTTPSTATUS.OK).json({
-      message: "Hello Subscribe to the channel & share",
+      message: "Hello World!!!",
     });
   })
 );
+
+// mount 
+app.use(`${BASE_PATH}/auth`, authRoutes);
 
 // error handler
 app.use(errorHandler);
