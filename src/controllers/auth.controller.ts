@@ -54,21 +54,16 @@ export const loginUserController = asyncHandler(
           });
         }
 
-        res.status(HTTPSTATUS.OK).json({
-          message: "Logged in successfully",
-          user,
+        req.logIn(user, (err) => {
+          if (err) {
+            return next(err);
+          }
+
+          return res.status(HTTPSTATUS.OK).json({
+            message: "Logged in successfully",
+            user,
+          });
         });
-
-        // req.logIn(user, (err) => {
-        //   if (err) {
-        //     return next(err);
-        //   }
-
-        //   return res.status(HTTPSTATUS.OK).json({
-        //     message: "Logged in successfully",
-        //     user,
-        //   });
-        // });
       }
     )(req, res, next);
   })
@@ -76,8 +71,15 @@ export const loginUserController = asyncHandler(
 
 export const logoutUserController = asyncHandler(
   async (req: Request, res: Response) => {
-    // Clear the session
-    req.session = null;
+    req.logOut((err) => {
+      if (err) {
+        console.error("Logout error:", err);
+        return res
+          .status(HTTPSTATUS.INTERNAL_SERVER_ERROR)
+          .json({ error: "Failed to log out" });
+      }
+    });
+    
     return res
       .status(HTTPSTATUS.OK)
       .json({ message: "Logged out successfully" });

@@ -41,6 +41,11 @@ const userSchema = new Schema<UserDocument>(
       default: null,
     },
 
+    currentWorkspace: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Workspace",
+    },
+
     isActive: {
       type: Boolean,
       default: true,
