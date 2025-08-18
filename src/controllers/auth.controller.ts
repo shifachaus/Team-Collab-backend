@@ -73,3 +73,13 @@ export const loginUserController = asyncHandler(
     )(req, res, next);
   })
 );
+
+export const logoutUserController = asyncHandler(
+  async (req: Request, res: Response) => {
+    // Clear the session
+    req.session = null;
+    return res
+      .status(HTTPSTATUS.OK)
+      .json({ message: "Logged out successfully" });
+  }
+);
