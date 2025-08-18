@@ -54,16 +54,21 @@ export const loginUserController = asyncHandler(
           });
         }
 
-        req.logIn(user, (err) => {
-          if (err) {
-            return next(err);
-          }
-
-          return res.status(HTTPSTATUS.OK).json({
-            message: "Logged in successfully",
-            user,
-          });
+        res.status(HTTPSTATUS.OK).json({
+          message: "Logged in successfully",
+          user,
         });
+
+        // req.logIn(user, (err) => {
+        //   if (err) {
+        //     return next(err);
+        //   }
+
+        //   return res.status(HTTPSTATUS.OK).json({
+        //     message: "Logged in successfully",
+        //     user,
+        //   });
+        // });
       }
     )(req, res, next);
   })
