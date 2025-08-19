@@ -54,3 +54,21 @@ export const getAllWorkspacesUserIsMemberService = async (userId: string) => {
   const workspaces = memberships.map((membership) => membership.workspaceId);
   return { workspaces };
 };
+
+export const getWorkspaceByIdService = async (workspaceId: string) => {
+  const workspace = await WorkspaceModel.findById(workspaceId);
+  if (!workspace) {
+    throw new NotFoundException("Workspace not found");
+  }
+
+  const members = await MemberModel.find({
+    workspaceId,
+  }).populate("role");
+
+  const workspaceWithMembers = {
+    ...workspace.toObject(),
+    members,
+  };
+
+  return { workspace: workspaceWithMembers };
+};

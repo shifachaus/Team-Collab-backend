@@ -2,8 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { UnauthorizedException } from "../utils/app-error";
 
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => { 
-  console.log(req.user,"hhhh");
-  
   if (!req.user || !req.user?._id) {
     throw new UnauthorizedException("Unauthorized. Please log in.");
   }
