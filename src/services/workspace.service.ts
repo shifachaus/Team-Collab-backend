@@ -7,7 +7,6 @@ import WorkspaceModel from "../models/workspace.model";
 import MemberModel from "../models/member.model";
 
 // CREATE NEW WORKSPACE
-
 export const createWorkspaceService = async (
   userId: string,
   body: { name: string; description?: string | undefined }
@@ -43,4 +42,15 @@ export const createWorkspaceService = async (
   await user.save();
 
   return { workspace };
+};
+
+// GET WORKSPACES USER IS A MEMBER
+export const getAllWorkspacesUserIsMemberService = async (userId: string) => {
+  const memberships = await MemberModel.find({ userId })
+    .populate("workspaceId")
+    .select("-password")
+    .exec();
+
+  const workspaces = memberships.map((membership) => membership.workspaceId);
+  return { workspaces };
 };
