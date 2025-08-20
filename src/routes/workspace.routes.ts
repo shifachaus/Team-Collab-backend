@@ -1,9 +1,12 @@
 import { Router } from "express";
 import {
+  changeWorkspaceMemberRoleController,
   createWorkspaceController,
   getAllWorkspacesUserIsMemberController,
+  getWorkspaceAnalyticsController,
   getWorkspaceByIdController,
   getWorkspaceMembersController,
+  
 } from "../controllers/workspace.controller";
 
 const workspaceRoutes = Router();
@@ -11,7 +14,10 @@ const workspaceRoutes = Router();
 workspaceRoutes.get("/all", getAllWorkspacesUserIsMemberController);
 workspaceRoutes.get("/:id", getWorkspaceByIdController);
 workspaceRoutes.get("/members/:id", getWorkspaceMembersController);
+workspaceRoutes.get("/analytics/:id", getWorkspaceAnalyticsController);
 
 workspaceRoutes.post("/create/new", createWorkspaceController);
 
-export default workspaceRoutes;
+ workspaceRoutes.put("/change/member/role/:id",  changeWorkspaceMemberRoleController)
+
+export default workspaceRoutes

@@ -2,7 +2,7 @@ import { PermissionType } from "../enums/role.enum";
 import { UnauthorizedException } from "./app-error";
 import { RolePermissions } from "./role-permission";
 
-export const roleGard = (
+export const roleGuard = (
   role: keyof typeof RolePermissions,
   requiredPermissions: PermissionType[]
 ) => {

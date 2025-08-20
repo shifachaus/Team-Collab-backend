@@ -5,6 +5,8 @@ import RoleModel from "../models/roles-permission.model";
 import { Roles } from "../enums/role.enum";
 import WorkspaceModel from "../models/workspace.model";
 import MemberModel from "../models/member.model";
+import TaskModel from "../models/task.model";
+import { TaskStatusEnum } from "../enums/task.enum";
 
 // CREATE NEW WORKSPACE
 export const createWorkspaceService = async (
@@ -85,4 +87,60 @@ export const getWorkspaceMembersService = async (workspaceId: string) => {
     .lean();
 
   return { members, roles };
+};
+
+// Get workspace task analytics
+export const getWorkspaceAnalyticsService = async (workspaceId: string) => {
+  const currentDate = new Date();
+
+  const totalTasks = await TaskModel.countDocuments({
+    workspace: workspaceId,
+  });
+
+  const overdueTask = await TaskModel.countDocuments({
+    workspace: workspaceId,
+    dueDate: { $lt: currentDate },
+    status: { $ne: TaskStatusEnum.DONE },
+  });
+
+  const completedTasks = await TaskModel.countDocuments({
+    workspace: workspaceId,
+    status: TaskStatusEnum.DONE,
+  });
+
+  const analytics = { totalTasks, completedTasks, overdueTask };
+  return { analytics };
+};
+
+export const changeMemberRoleService = async (
+  workspaceId: string,
+  memberId: string,
+  roleId: string
+) => {
+  const workspace = await WorkspaceModel.findById(workspaceId);
+  if (!workspace) {
+    throw new NotFoundException("Workspace not found");
+  }
+
+  const role = await RoleModel.findById(roleId);
+  if (!role) {
+    throw new NotFoundException("Role not found");
+  }
+
+  const member = await MemberModel.findOne({
+    userId: memberId,
+    workspaceId: workspaceId,
+  });
+
+  if (!member) {
+    throw new Error("Member not found in the workspace");
+  }
+
+  // assign the new role.
+  member.role = role;
+  await member.save();
+
+  return {
+    member,
+  };
 };
