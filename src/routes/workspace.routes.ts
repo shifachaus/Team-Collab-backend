@@ -6,7 +6,7 @@ import {
   getWorkspaceAnalyticsController,
   getWorkspaceByIdController,
   getWorkspaceMembersController,
-  
+  updateWorkspaceByIdController
 } from "../controllers/workspace.controller";
 
 const workspaceRoutes = Router();
@@ -18,6 +18,12 @@ workspaceRoutes.get("/analytics/:id", getWorkspaceAnalyticsController);
 
 workspaceRoutes.post("/create/new", createWorkspaceController);
 
- workspaceRoutes.put("/change/member/role/:id",  changeWorkspaceMemberRoleController)
+workspaceRoutes.put(
+  "/change/member/role/:id",
+  changeWorkspaceMemberRoleController
+);
+workspaceRoutes.put("/update/:id", updateWorkspaceByIdController);
 
-export default workspaceRoutes
+//  workspaceRoutes.delete("/delete/:id");
+
+export default workspaceRoutes;

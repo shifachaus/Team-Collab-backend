@@ -8,11 +8,6 @@ export const nameSchema = z
 
 export const descriptionSchema = z.string().trim().optional();
 
-export const createWorkspaceSchema = z.object({
-  name: nameSchema,
-  description: descriptionSchema,
-});
-
 export const workspaceIdSchema = z
   .string()
   .trim()
@@ -21,4 +16,14 @@ export const workspaceIdSchema = z
 export const changeRoleSchema = z.object({
   roleId: z.string().trim().min(1),
   memberId: z.string().trim().min(1),
+});
+
+export const createWorkspaceSchema = z.object({
+  name: nameSchema,
+  description: descriptionSchema,
+});
+
+export const updateWorkspaceSchema = z.object({
+  name: nameSchema,
+  description: descriptionSchema,
 });

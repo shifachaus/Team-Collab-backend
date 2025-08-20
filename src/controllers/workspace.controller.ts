@@ -3,6 +3,7 @@ import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import {
   changeRoleSchema,
   createWorkspaceSchema,
+  updateWorkspaceSchema,
   workspaceIdSchema,
 } from "../validation/workspace.validation";
 import { HTTPSTATUS } from "../config/http.config";
@@ -13,6 +14,7 @@ import {
   getWorkspaceAnalyticsService,
   getWorkspaceByIdService,
   getWorkspaceMembersService,
+  updateWorkspaceByIdService,
 } from "../services/workspace.service";
 import { getMemberRoleInWorkspace } from "../services/member.service";
 import { roleGuard } from "../utils/role-guard";
@@ -114,6 +116,27 @@ export const changeWorkspaceMemberRoleController = asyncHandler(
     return res.status(HTTPSTATUS.OK).json({
       message: "Member Role changed successfully",
       member,
+    });
+  }
+);
+
+export const updateWorkspaceByIdController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const workspaceId = workspaceIdSchema.parse(req.params.id);
+    const { name, description } = updateWorkspaceSchema.parse(req.body);
+    const userId = req.user?._id;
+
+    const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
+    roleGuard(role, [Permissions.CHANGE_MEMBER_ROLE]);
+
+    const { workspace } = await updateWorkspaceByIdService(
+      workspaceId,
+      name,
+      description
+    );
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Workspace updated successfully",
+      workspace,
     });
   }
 );
