@@ -2,11 +2,12 @@ import { Router } from "express";
 import {
   changeWorkspaceMemberRoleController,
   createWorkspaceController,
+  deleteWorkspaceByIdController,
   getAllWorkspacesUserIsMemberController,
   getWorkspaceAnalyticsController,
   getWorkspaceByIdController,
   getWorkspaceMembersController,
-  updateWorkspaceByIdController
+  updateWorkspaceByIdController,
 } from "../controllers/workspace.controller";
 
 const workspaceRoutes = Router();
@@ -24,6 +25,6 @@ workspaceRoutes.put(
 );
 workspaceRoutes.put("/update/:id", updateWorkspaceByIdController);
 
-//  workspaceRoutes.delete("/delete/:id");
+workspaceRoutes.delete("/delete/:id", deleteWorkspaceByIdController);
 
 export default workspaceRoutes;
