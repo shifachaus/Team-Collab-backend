@@ -11,10 +11,10 @@ const prioritySchema = z.enum(
 );
 
 const statusSchema = z.enum(
-  Object.values(TaskStatusEnum) as [string, ...string[]]
-);
+    Object.values(TaskStatusEnum) as [string, ...string[]]
+  );
 
-export const dueDateSchema = z
+  export const dueDateSchema = z
   .string()
   .trim()
   .optional()
@@ -27,7 +27,8 @@ export const dueDateSchema = z
     }
   );
 
-export const taskIdSchema = z.string().trim().min(1);
+  export const taskIdSchema = z.string().trim().min(1);
+
 
 export const createTaskSchema = z.object({
   title: titleSchema,
