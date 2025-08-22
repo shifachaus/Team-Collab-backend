@@ -73,9 +73,9 @@ export const getAllTaskController = asyncHandler(
     const workspaceId = workspaceIdSchema.parse(req.params.workspaceId);
 
     const filters = {
-      projectId: req.params.projectId as string | undefined,
-      status: req.params.status
-        ? (req.params.status as string)?.split(",")
+      projectId: req.query.projectId as string | undefined,
+      status: req.query.status
+        ? (req.query.status as string)?.split(",")
         : undefined,
       priority: req.query.priority
         ? (req.query.priority as string)?.split(",")
