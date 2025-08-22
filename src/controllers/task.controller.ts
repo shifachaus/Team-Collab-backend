@@ -9,6 +9,7 @@ import { Permissions } from "../enums/role.enum";
 import { HTTPSTATUS } from "../config/http.config";
 import {
   createTaskService,
+  deleteTaskService,
   getAllTaskService,
   getTaskByIdSevice,
   updateTaskService,
@@ -108,7 +109,7 @@ export const getAllTaskController = asyncHandler(
 export const getTaskByIdController = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user?._id;
-    
+
     const taskId = taskIdSchema.parse(req.params.id);
     const projectId = projectIdSchema.parse(req.params.projectId);
     const workspaceId = workspaceIdSchema.parse(req.params.workspaceId);
@@ -121,6 +122,24 @@ export const getTaskByIdController = asyncHandler(
     return res.status(HTTPSTATUS.OK).json({
       message: "Task fetched successfully",
       task,
+    });
+  }
+);
+
+export const deleteTaskController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    
+    const taskId = taskIdSchema.parse(req.params.id);
+    const workspaceId = workspaceIdSchema.parse(req.params.workspaceId);
+
+    const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
+    roleGuard(role, [Permissions.DELETE_TASK]);
+
+    await deleteTaskService(workspaceId, taskId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Task deleted successfully",
     });
   }
 );
