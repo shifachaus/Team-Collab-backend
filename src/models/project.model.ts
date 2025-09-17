@@ -1,5 +1,4 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { generateInviteCode } from "../utils/uuid";
 
 export interface ProjectDocument extends Document {
   name: string;
