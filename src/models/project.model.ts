@@ -32,13 +32,13 @@ const projectSchema = new Schema<ProjectDocument>(
 
     workspace: {
       type: mongoose.Schema.Types.ObjectId,
-      require: "Workspace",
+      ref: "Workspace",
       required: true,
     },
 
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      require: "User",
+      ref: "User",
       required: true,
     },
   },
