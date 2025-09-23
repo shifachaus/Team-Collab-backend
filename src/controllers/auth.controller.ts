@@ -9,8 +9,7 @@ import { signJwtToken } from "../utils/jwt";
 
 export const googleLoginCallback = asyncHandler(
   async (req: Request, res: Response) => {
-
-    const jwt = req.jwt
+    const jwt = req.jwt;
 
     const currentWorkspace = req.user?.currentWorkspace;
 
@@ -73,12 +72,12 @@ export const loginUserController = asyncHandler(
         //   });
         // });
 
-        const access_token = signJwtToken({userId:user._id});
-          return res.status(HTTPSTATUS.OK).json({
-            message: "Logged in successfully",
-            access_token,
-            user,
-          });
+        const access_token = signJwtToken({ userId: user._id });
+        return res.status(HTTPSTATUS.OK).json({
+          message: "Logged in successfully",
+          access_token,
+          user,
+        });
       }
     )(req, res, next);
   })
@@ -86,15 +85,15 @@ export const loginUserController = asyncHandler(
 
 export const logoutUserController = asyncHandler(
   async (req: Request, res: Response) => {
-    req.logOut((err) => {
-      if (err) {
-        console.error("Logout error:", err);
-        return res
-          .status(HTTPSTATUS.INTERNAL_SERVER_ERROR)
-          .json({ error: "Failed to log out" });
-      }
-    });
-    
+    // req.logOut((err) => {
+    //   if (err) {
+    //     console.error("Logout error:", err);
+    //     return res
+    //       .status(HTTPSTATUS.INTERNAL_SERVER_ERROR)
+    //       .json({ error: "Failed to log out" });
+    //   }
+    // });
+
     return res
       .status(HTTPSTATUS.OK)
       .json({ message: "Logged out successfully" });
