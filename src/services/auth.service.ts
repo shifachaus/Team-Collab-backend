@@ -12,6 +12,15 @@ import {
 import MemberModel from "../models/member.model";
 import { ProviderEnum } from "../enums/account-provider.enum";
 
+export const findUserByIdService = async (userId: string) => {
+
+  const user = await UserModel.findById(userId, {
+    password: false,
+  });
+
+  return user || null;
+};
+
 export const loginOrCreateAccountService = async (data: {
   provider: string;
   displayName: string;
