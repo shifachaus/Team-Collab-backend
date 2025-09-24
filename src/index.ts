@@ -10,7 +10,7 @@ import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 // import { BadRequestException } from "./utils/app-error";
 // import { ErrorCodeEnum } from "./enums/error-code.enum";
 
-import "./utils/jwt"
+import "./utils/jwt";
 
 import "./config/passport.config";
 import passport from "passport";
@@ -49,12 +49,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 // app.use(passport.session());
 
+const allowedOrigins = config.FRONTEND_ORIGIN.split(",");
+
 app.use(
   cors({
-    origin: config.FRONTEND_ORIGIN,
-    credentials: true,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: false,
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 
 app.get(
   `/`,
@@ -69,10 +79,9 @@ app.get(
   })
 );
 
-
 // mount
 app.use(`${BASE_PATH}/auth`, authRoutes);
-app.use(`${BASE_PATH}/user`, passportAuthenticateJwt,userRoutes);
+app.use(`${BASE_PATH}/user`, passportAuthenticateJwt, userRoutes);
 app.use(`${BASE_PATH}/workspace`, passportAuthenticateJwt, workspaceRoutes);
 app.use(`${BASE_PATH}/member`, passportAuthenticateJwt, memberRoutes);
 app.use(`${BASE_PATH}/project`, passportAuthenticateJwt, projectRoutes);
