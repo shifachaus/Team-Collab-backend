@@ -22,6 +22,7 @@ import memberRoutes from "./routes/member.routes";
 import projectRoutes from "./routes/project.routes";
 import taskRoutes from "./routes/task.routes";
 import { passportAuthenticateJwt } from "./config/passport.config";
+import auditlogRoutes from "./routes/auditlog.routes";
 
 //App Initialization
 const app = express();
@@ -86,6 +87,7 @@ app.use(`${BASE_PATH}/workspace`, passportAuthenticateJwt, workspaceRoutes);
 app.use(`${BASE_PATH}/member`, passportAuthenticateJwt, memberRoutes);
 app.use(`${BASE_PATH}/project`, passportAuthenticateJwt, projectRoutes);
 app.use(`${BASE_PATH}/task`, passportAuthenticateJwt, taskRoutes);
+app.use(`${BASE_PATH}/auditlog`, passportAuthenticateJwt, auditlogRoutes);
 
 // error handler
 app.use(errorHandler);
