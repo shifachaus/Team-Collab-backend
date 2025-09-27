@@ -18,6 +18,11 @@ import {
   getProjectsInWorkspaceService,
   updateProjectService,
 } from "../services/project.service";
+import { createAuditLogServices } from "../services/auditlog.service";
+import { AuditActionEnum, AuditEntityEnum } from "../enums/auditlog.enum";
+import { getMetadata } from "../utils/auditlog.helper";
+import { NotFoundException } from "../utils/app-error";
+import ProjectModel from "../models/project.model";
 
 export const createProjectController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -30,6 +35,27 @@ export const createProjectController = asyncHandler(
     roleGuard(role, [Permissions.CREATE_PROJECT]);
 
     const { project } = await createProjectService(userId, workspaceId, body);
+
+    await createAuditLogServices({
+      workspaceId: workspaceId,
+      projectId: (project._id as string).toString(),
+      action: AuditActionEnum.CREATE,
+      entityType: AuditEntityEnum.PROJECT,
+      createdBy: userId.toString(),
+      metadata: getMetadata(
+        AuditEntityEnum.PROJECT,
+        {
+          name: project.name,
+          createdBy: {
+            _id: userId,
+            name: req.user?.name,
+            email: req.user?.email,
+          },
+          comment: "",
+        },
+        AuditActionEnum.CREATE
+      ),
+    });
 
     return res.status(HTTPSTATUS.OK).json({
       message: "Project created successfully",
@@ -119,11 +145,42 @@ export const updateProjectController = asyncHandler(
     const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
     roleGuard(role, [Permissions.EDIT_PROJECT]);
 
+    // Fetch old workspace
+    const oldProject = await ProjectModel.findById(projectId);
+    if (!oldProject) throw new NotFoundException("Project not found");
+
     const { project } = await updateProjectService(
       workspaceId,
       projectId,
       body
     );
+
+    await createAuditLogServices({
+      workspaceId: workspaceId,
+      projectId: projectId,
+      action: AuditActionEnum.UPDATE,
+      entityType: AuditEntityEnum.PROJECT,
+      createdBy: userId.toString(),
+      metadata: getMetadata(
+        AuditEntityEnum.PROJECT,
+        {
+          oldValue: {
+            name: oldProject.name,
+            description: oldProject.description,
+          },
+          newValue: {
+            name: project.name,
+            description: project.description,
+          },
+          updatedBy: {
+            _id: userId,
+            name: req.user?.name,
+            email: req.user?.email,
+          },
+        },
+        AuditActionEnum.UPDATE
+      ),
+    });
 
     return res.status(HTTPSTATUS.OK).json({
       message: "Project updated successfully",
@@ -140,6 +197,38 @@ export const deleteProjectController = asyncHandler(
 
     const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
     roleGuard(role, [Permissions.DELETE_PROJECT]);
+
+    // Fetch workspace before deletion for metadata
+    const project = await ProjectModel.findById(projectId);
+
+    if (!project) {
+      return res.status(HTTPSTATUS.NOT_FOUND).json({
+        message: "Task not found",
+        errorCode: "RESOURCE_NOT_FOUND",
+      });
+    }
+
+    await createAuditLogServices({
+      workspaceId: workspaceId,
+      projectId: projectId,
+      action: AuditActionEnum.DELETE,
+      entityType: AuditEntityEnum.PROJECT,
+      createdBy: userId.toString(),
+      metadata: getMetadata(
+        AuditEntityEnum.PROJECT,
+        {
+          name: project.name,
+          deletedBy: {
+            _id: userId,
+            name: req.user?.name,
+            email: req.user?.email,
+          },
+          deletedAt: new Date(),
+          comment: "",
+        },
+        AuditActionEnum.DELETE
+      ),
+    });
 
     await deltedProjectService(workspaceId, projectId);
 

@@ -14,6 +14,11 @@ import {
   getTaskByIdSevice,
   updateTaskService,
 } from "../services/task.service";
+import { createAuditLogServices } from "../services/auditlog.service";
+import { AuditActionEnum, AuditEntityEnum } from "../enums/auditlog.enum";
+import { getMetadata } from "../utils/auditlog.helper";
+import TaskModel from "../models/task.model";
+import { NotFoundException } from "../utils/app-error";
 
 export const createTaskController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -34,6 +39,28 @@ export const createTaskController = asyncHandler(
       body
     );
 
+    await createAuditLogServices({
+      workspaceId: workspaceId,
+      projectId: projectId,
+      taskId: (task._id as string).toString(),
+      action: AuditActionEnum.CREATE,
+      entityType: AuditEntityEnum.TASK,
+      createdBy: userId.toString(),
+      metadata: getMetadata(
+        AuditEntityEnum.TASK,
+        {
+          name: task.title,
+          createdBy: {
+            _id: userId,
+            name: req.user?.name,
+            email: req.user?.email,
+          },
+          comment: "",
+        },
+        AuditActionEnum.CREATE
+      ),
+    });
+
     return res.status(HTTPSTATUS.OK).json({
       message: "Task created successfully",
       task,
@@ -52,7 +79,11 @@ export const updateTaskController = asyncHandler(
     const workspaceId = workspaceIdSchema.parse(req.params.workspaceId);
 
     const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
-    roleGuard(role, [Permissions.CREATE_TASK]);
+    roleGuard(role, [Permissions.EDIT_TASK]);
+
+    // Fetch old workspace
+    const oldTask = await TaskModel.findById(taskId);
+    if (!oldTask) throw new NotFoundException("task not found");
 
     const { updatedTask } = await updateTaskService(
       workspaceId,
@@ -60,6 +91,34 @@ export const updateTaskController = asyncHandler(
       taskId,
       body
     );
+
+    await createAuditLogServices({
+      workspaceId: workspaceId,
+      projectId: projectId,
+      taskId: taskId,
+      action: AuditActionEnum.UPDATE,
+      entityType: AuditEntityEnum.TASK,
+      createdBy: userId.toString(),
+      metadata: getMetadata(
+        AuditEntityEnum.TASK,
+        {
+          oldValue: {
+            name: oldTask.title,
+            description: oldTask.description,
+          },
+          newValue: {
+            name: updatedTask.title,
+            description: updatedTask.description,
+          },
+          updatedBy: {
+            _id: userId,
+            name: req.user?.name,
+            email: req.user?.email,
+          },
+        },
+        AuditActionEnum.UPDATE
+      ),
+    });
 
     return res.status(HTTPSTATUS.OK).json({
       message: "Task updated successfully",
@@ -129,12 +188,48 @@ export const getTaskByIdController = asyncHandler(
 export const deleteTaskController = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user?._id;
-    
+
     const taskId = taskIdSchema.parse(req.params.id);
     const workspaceId = workspaceIdSchema.parse(req.params.workspaceId);
 
     const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
     roleGuard(role, [Permissions.DELETE_TASK]);
+
+    // Fetch workspace before deletion for metadata
+    const task = await TaskModel.findById(taskId);
+    if (!task) {
+      return res.status(HTTPSTATUS.NOT_FOUND).json({
+        message: "Task not found",
+        errorCode: "RESOURCE_NOT_FOUND",
+      });
+    }
+
+    const projectId = task.project?.toString() || null;
+
+    const taskMetadata = {
+      name: task.title,
+      deletedBy: {
+        _id: userId,
+        name: req.user?.name,
+        email: req.user?.email,
+      },
+      deletedAt: new Date(),
+      comment: "",
+    };
+
+    await createAuditLogServices({
+      workspaceId: workspaceId,
+      taskId: taskId,
+      projectId: projectId,
+      action: AuditActionEnum.DELETE,
+      entityType: AuditEntityEnum.TASK,
+      createdBy: userId.toString(),
+      metadata: getMetadata(
+        AuditEntityEnum.TASK,
+        taskMetadata,
+        AuditActionEnum.DELETE
+      ),
+    });
 
     await deleteTaskService(workspaceId, taskId);
 

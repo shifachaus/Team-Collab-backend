@@ -15,6 +15,7 @@ export interface AuditLogDocument extends Document {
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
+  metadata?: Record<string, any>;
 }
 
 const auditLogSchema = new Schema<AuditLogDocument>(
@@ -52,6 +53,10 @@ const auditLogSchema = new Schema<AuditLogDocument>(
       type: String,
       enum: Object.values(AuditEntityEnum),
       default: AuditEntityEnum.WORKSPACE,
+    },
+    metadata: {
+      type: Schema.Types.Mixed,
+      default: null,
     },
   },
   {
