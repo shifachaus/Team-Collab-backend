@@ -25,6 +25,7 @@ import { AuditActionEnum, AuditEntityEnum } from "../enums/auditlog.enum";
 import { getMetadata } from "../utils/auditlog.helper";
 import { NotFoundException } from "../utils/app-error";
 import WorkspaceModel from "../models/workspace.model";
+import AuditLogModel from "../models/auditlog.model";
 
 export const createWorkspaceController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -211,13 +212,14 @@ export const deleteWorkspaceByIdController = asyncHandler(
     const workspace = await WorkspaceModel.findById(workspaceId);
     if (!workspace) throw new NotFoundException("Workspace not found");
 
+    await AuditLogModel.deleteMany({ workspaceId });
+
     const { currentWorkspace } = await deleteWorkspaceByIdService(
       workspaceId,
       userId
     );
 
     // delete audit log for that workspace
-
     return res.status(HTTPSTATUS.OK).json({
       message: "Workspace deleted successfully",
       currentWorkspace,
