@@ -50,11 +50,13 @@ export const createTaskController = asyncHandler(
         AuditEntityEnum.TASK,
         {
           name: task.title,
+          taskCodeId: task.taskCode,
           createdBy: {
             _id: userId,
             name: req.user?.name,
             email: req.user?.email,
           },
+          assignedTo: task.assignedTo,
           comment: "",
         },
         AuditActionEnum.CREATE
@@ -104,12 +106,16 @@ export const updateTaskController = asyncHandler(
         {
           oldValue: {
             name: oldTask.title,
-            description: oldTask.description,
+            priority: oldTask.priority,
+            status: oldTask.status,
           },
           newValue: {
             name: updatedTask.title,
-            description: updatedTask.description,
+            priority: updatedTask.priority,
+            status: updatedTask.status,
           },
+
+          taskCodeId: updatedTask.taskCode,
           updatedBy: {
             _id: userId,
             name: req.user?.name,
@@ -208,6 +214,7 @@ export const deleteTaskController = asyncHandler(
 
     const taskMetadata = {
       name: task.title,
+      taskCodeId: task.taskCode,
       deletedBy: {
         _id: userId,
         name: req.user?.name,

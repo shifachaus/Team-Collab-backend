@@ -1,3 +1,4 @@
+import { log } from "console";
 import {
   AuditActionEnumType,
   AuditEntityEnumType,
@@ -7,6 +8,7 @@ import ProjectModel from "../models/project.model";
 import TaskModel from "../models/task.model";
 import WorkspaceModel from "../models/workspace.model";
 import { NotFoundException } from "../utils/app-error";
+import UserModel from "../models/user.model";
 
 interface CreateAuditLogParams {
   workspaceId: string;
@@ -57,7 +59,6 @@ export const createAuditLogServices = async ({
     }
   }
 
-
   // 4️⃣ Create the audit log
   const auditLog = await AuditLogModel.create({
     workspaceId,
@@ -76,6 +77,18 @@ export const getAuditLogByWorkspaceIdService = async (workspaceId: string) => {
   const logs = await AuditLogModel.find({ workspaceId })
     .populate("createdBy", "name email profilePicture -password")
     .sort({ createdAt: -1 });
+
+  for (const log of logs) {
+    if (log.metadata?.assignedTo) {
+      const user = await UserModel.findById(log.metadata.assignedTo)
+        .select("_id name email profilePicture -password")
+        .lean();
+
+      if (user) {
+        log.metadata.assignedTo = user;
+      }
+    }
+  }
 
   if (!logs || logs.length === 0) {
     throw new NotFoundException("No audit logs found for this workspace");

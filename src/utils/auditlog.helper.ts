@@ -16,7 +16,7 @@ export const getMetadata = (
         return {
           oldValue: entity.oldValue,
           newValue: entity.newValue,
-          updaetdedBy: entity.updaetdedBy,
+          updatedBy: entity.updatedBy,
           comment: entity.comment || "",
         };
       }
@@ -31,7 +31,7 @@ export const getMetadata = (
         return {
           oldValue: entity.oldValue,
           newValue: entity.newValue,
-          updaetdedBy: entity.updaetdedBy,
+          updatedBy: entity.updatedBy,
           comment: entity.comment || "",
         };
       } else if (action === AuditActionEnum.DELETE) {
@@ -54,8 +54,9 @@ export const getMetadata = (
         return {
           oldValue: entity.oldValue,
           newValue: entity.newValue,
-          updaetdedBy: entity.updaetdedBy,
+          updatedBy: entity.updatedBy,
           comment: entity.comment || "",
+          taskCodeId: entity.taskCodeId,
         };
       } else if (action === AuditActionEnum.DELETE) {
         return {
@@ -63,13 +64,15 @@ export const getMetadata = (
           deletedBy: entity.deletedBy,
           deletedAt: entity.deletedAt,
           comment: entity.comment || "",
+          taskCodeId: entity.taskCodeId,
         };
       }
       return {
-        taskTitle: entity.title,
+        taskName: entity.name,
         createdBy: entity.createdBy,
         assignedTo: entity.assignedTo || null,
         comment: entity.comment || "",
+        taskCodeId: entity.taskCodeId,
       };
 
     default:
