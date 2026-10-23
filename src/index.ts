@@ -1,23 +1,18 @@
 import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
-// import session from "express-session";
 import { config } from "./config/app.config";
 import connectDatabase from "./config/database.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware.ts";
 import { HTTPSTATUS } from "./config/http.config";
 import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import cookieParser from "cookie-parser";
-// import { BadRequestException } from "./utils/app-error";
-// import { ErrorCodeEnum } from "./enums/error-code.enum";
-
 import "./utils/jwt";
 
 import "./config/passport.config";
 import passport from "passport";
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
-// import isAuthenticated from "./middlewares/isAuthenticated.middleware";
 import workspaceRoutes from "./routes/workspace.routes";
 import memberRoutes from "./routes/member.routes";
 import projectRoutes from "./routes/project.routes";
@@ -34,20 +29,6 @@ const BASE_PATH = config.BASE_PATH;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-//Session Configuration
-// app.use(
-//   session({
-//     secret: config.SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: {
-//       maxAge: 24 * 60 * 60 * 1000,
-//       httpOnly: true,
-//       secure: config.NODE_ENV === "production",
-//     },
-//   })
-// );
 
 app.use(passport.initialize());
 // app.use(passport.session());
@@ -72,10 +53,6 @@ app.use(
 app.get(
   `/`,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    // throw new BadRequestException(
-    //   "This is a bad request",
-    //   ErrorCodeEnum.AUTH_INVALID_TOKEN
-    // );
     return res.status(HTTPSTATUS.OK).json({
       message: "Hello World!!!",
     });

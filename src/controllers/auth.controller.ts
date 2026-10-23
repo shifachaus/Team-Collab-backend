@@ -7,8 +7,6 @@ import { registerSchema } from "../validation/auth.validation";
 import { registerUserService } from "../services/auth.service";
 import { signJwtToken } from "../utils/jwt";
 
-
-
 export const googleLoginCallback = asyncHandler(
   async (req: Request, res: Response) => {
     const token = req.jwt;
@@ -21,8 +19,8 @@ export const googleLoginCallback = asyncHandler(
 
     res.cookie("access_token", token, {
       httpOnly: true,
-      secure: config.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
       path: "/",
     });
@@ -32,8 +30,6 @@ export const googleLoginCallback = asyncHandler(
     );
   }
 );
-
-
 
 export const registerUserController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -66,18 +62,6 @@ export const loginUserController = asyncHandler(
             message: info?.message || "Invalid email or password",
           });
         }
-
-        // req.logIn(user, (err) => {
-        //   if (err) {
-        //     return next(err);
-        //   }
-
-        //   return res.status(HTTPSTATUS.OK).json({
-        //     message: "Logged in successfully",
-        //     user,
-        //   });
-        // });
-
         const access_token = signJwtToken({ userId: user._id });
         return res.status(HTTPSTATUS.OK).json({
           message: "Logged in successfully",
@@ -91,15 +75,6 @@ export const loginUserController = asyncHandler(
 
 export const logoutUserController = asyncHandler(
   async (req: Request, res: Response) => {
-    // req.logOut((err) => {
-    //   if (err) {
-    //     console.error("Logout error:", err);
-    //     return res
-    //       .status(HTTPSTATUS.INTERNAL_SERVER_ERROR)
-    //       .json({ error: "Failed to log out" });
-    //   }
-    // });
-
     res.clearCookie("access_token", {
       httpOnly: true,
       secure: config.NODE_ENV === "production",
