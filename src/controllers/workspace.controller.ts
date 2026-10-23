@@ -36,7 +36,7 @@ export const createWorkspaceController = asyncHandler(
     const { workspace } = await createWorkspaceService(userId, body);
 
     await createAuditLogServices({
-      workspaceId: (workspace._id as string).toString(),
+      workspaceId: workspace._id.toString(),
       action: AuditActionEnum.CREATE,
       entityType: AuditEntityEnum.WORKSPACE,
       createdBy: userId.toString(),

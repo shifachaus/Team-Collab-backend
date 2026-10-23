@@ -24,10 +24,9 @@ passport.use(
       passReqToCallback: true,
     },
     async (req: Request, accessToken, refreshToken, profile, done) => {
+  
       try {
         const { email, sub: googleId, picture } = profile._json;
-        console.log(profile, "profile");
-        console.log(googleId, "googleId");
 
         if (!googleId) {
           throw new NotFoundException("Google ID (sub) is missing");
@@ -75,7 +74,10 @@ interface JwtPayload {
 }
 
 const options: StrategyOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: ExtractJwt.fromExtractors([
+    (req) => req?.cookies?.access_token ?? null,
+    ExtractJwt.fromAuthHeaderAsBearerToken(),
+  ]),
   secretOrKey: config.JWT_SECRET,  
   audience: ["User"],
   algorithms: ["HS256"],

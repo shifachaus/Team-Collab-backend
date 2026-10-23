@@ -38,7 +38,7 @@ export const createProjectController = asyncHandler(
 
     await createAuditLogServices({
       workspaceId: workspaceId,
-      projectId: (project._id as string).toString(),
+      projectId: project._id.toString(),
       action: AuditActionEnum.CREATE,
       entityType: AuditEntityEnum.PROJECT,
       createdBy: userId.toString(),

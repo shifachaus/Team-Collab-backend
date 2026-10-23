@@ -7,6 +7,7 @@ import connectDatabase from "./config/database.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware.ts";
 import { HTTPSTATUS } from "./config/http.config";
 import { asyncHandler } from "./middlewares/asyncHandler.middleware";
+import cookieParser from "cookie-parser";
 // import { BadRequestException } from "./utils/app-error";
 // import { ErrorCodeEnum } from "./enums/error-code.enum";
 
@@ -32,6 +33,7 @@ const BASE_PATH = config.BASE_PATH;
 //Middleware Setup
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 //Session Configuration
 // app.use(

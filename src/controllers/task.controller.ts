@@ -42,7 +42,7 @@ export const createTaskController = asyncHandler(
     await createAuditLogServices({
       workspaceId: workspaceId,
       projectId: projectId,
-      taskId: (task._id as string).toString(),
+      taskId: task._id.toString(),
       action: AuditActionEnum.CREATE,
       entityType: AuditEntityEnum.TASK,
       createdBy: userId.toString(),

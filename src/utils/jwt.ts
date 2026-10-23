@@ -14,6 +14,7 @@ type SignOptionAndSecret = SignOptions & {
 
 const defaults: SignOptions = {
   audience: ["User"],
+  algorithm: "HS256",
 };
 
 export const accessTokenSignOption: SignOptionAndSecret = {

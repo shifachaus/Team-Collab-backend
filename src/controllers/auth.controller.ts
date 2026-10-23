@@ -7,27 +7,33 @@ import { registerSchema } from "../validation/auth.validation";
 import { registerUserService } from "../services/auth.service";
 import { signJwtToken } from "../utils/jwt";
 
+
+
 export const googleLoginCallback = asyncHandler(
   async (req: Request, res: Response) => {
-    const jwt = req.jwt;
+    const token = req.jwt;
 
-    const currentWorkspace = req.user?.currentWorkspace;
-
-    if (!jwt) {
+    if (!token) {
       return res.redirect(
         `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`
       );
     }
 
-    // return res.redirect(
-    //   `${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}`
-    // );
+    res.cookie("access_token", token, {
+      httpOnly: true,
+      secure: config.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+      path: "/",
+    });
 
     return res.redirect(
-      `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=success&access_token=${jwt}&current_workspace=${currentWorkspace}`
+      `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=success`
     );
   }
 );
+
+
 
 export const registerUserController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -93,6 +99,13 @@ export const logoutUserController = asyncHandler(
     //       .json({ error: "Failed to log out" });
     //   }
     // });
+
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: config.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    });
 
     return res
       .status(HTTPSTATUS.OK)
